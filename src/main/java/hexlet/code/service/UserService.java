@@ -41,7 +41,7 @@ public class UserService {
     public UserDTO create(UserCreateDTO data) {
         User newUser = userMapper.map(data);
         String encodedPassword = encoder.encode(data.getPassword());
-        newUser.setPassword(encodedPassword);
+        newUser.setEncodedPassword(encodedPassword);
         userRepository.save(newUser);
         return userMapper.map(newUser);
     }
@@ -53,7 +53,7 @@ public class UserService {
 
         if (data.getPassword() != null) {
             String encodedPassword = encoder.encode(data.getPassword().get());
-            user.setPassword(encodedPassword);
+            user.setEncodedPassword(encodedPassword);
         }
 
         userRepository.save(user);
