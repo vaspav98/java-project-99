@@ -1,6 +1,7 @@
 package hexlet.code.component;
 
 import hexlet.code.dto.UserCreateDTO;
+import hexlet.code.repository.UserRepository;
 import hexlet.code.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,15 @@ public class DataInitializer implements ApplicationRunner {
     private UserService userService;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private PasswordEncoder encoder;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        userRepository.deleteByEmail("hexlet@example.com");
+
         String firstName = "Pavel";
         String lastName = "Vasilev";
         String email = "hexlet@example.com";
