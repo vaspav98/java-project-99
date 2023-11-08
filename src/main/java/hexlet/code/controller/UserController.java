@@ -9,6 +9,7 @@ import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,8 +33,11 @@ public class UserController {
     private UserUtils userUtils;
 
     @GetMapping("")
-    public List<UserDTO> index() {
-        return userService.getAll();
+    public ResponseEntity<List<UserDTO>> index() {
+        List<UserDTO> userDTOList = userService.getAll();
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("X-Total-Count", String.valueOf(userDTOList.size()))
+                .body(userDTOList);
     }
 
     @GetMapping("/{id}")
