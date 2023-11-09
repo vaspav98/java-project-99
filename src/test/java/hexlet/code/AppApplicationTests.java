@@ -17,6 +17,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class AppApplicationTests {
 
     @Autowired
@@ -74,6 +76,7 @@ class AppApplicationTests {
 
     @Test
     public void testShow() throws Exception {
+        System.out.println(userRepository.findAll());
         MvcResult result = mockMvc.perform(get("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -88,6 +91,7 @@ class AppApplicationTests {
 
     @Test
     public void testIndex() throws Exception {
+        System.out.println(userRepository.findAll());
         MvcResult result = mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -99,11 +103,12 @@ class AppApplicationTests {
 
     @Test
     public void testCreate() throws Exception {
-        testUser.setEmail("vas-pav@mail.ru");
+        System.out.println(userRepository.findAll());
+        Map<String, String> data = new HashMap<>(Map.of("password", "123", "email", "vspv@mail.ru"));
 
         MockHttpServletRequestBuilder request = post("/api/users").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(testUser));
+                .content(om.writeValueAsString(data));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
@@ -117,6 +122,7 @@ class AppApplicationTests {
 
     @Test
     public void testUpdate() throws Exception {
+        System.out.println(userRepository.findAll());
         Map<String, String> data = new HashMap<>(Map.of("firstName", "Pavel", "email", "vspv@mail.ru"));
 
         MockHttpServletRequestBuilder request = put("/api/users/" + testUser.getId()).with(token)
@@ -134,6 +140,7 @@ class AppApplicationTests {
 
     @Test
     public void testDelete() throws Exception {
+        System.out.println(userRepository.findAll());
         mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isNoContent());
 
