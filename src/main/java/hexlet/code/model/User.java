@@ -1,11 +1,13 @@
 package hexlet.code.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -43,6 +46,9 @@ public class User implements BaseEntity, UserDetails {
 
     @NotBlank
     private String encodedPassword;
+
+    @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
+    private List<Task> tasks;
 
     @CreatedDate
     private LocalDate createdAt;

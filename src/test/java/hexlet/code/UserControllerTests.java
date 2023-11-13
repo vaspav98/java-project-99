@@ -3,16 +3,14 @@ package hexlet.code;
 import hexlet.code.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.repository.UserRepository;
-import net.datafaker.Faker;
+import hexlet.code.util.ModelGenerator;
 import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -46,10 +44,7 @@ class UserControllerTests {
     private ObjectMapper om;
 
     @Autowired
-    private Faker faker;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private ModelGenerator modelGenerator;
 
     private User testUser;
 
@@ -57,18 +52,8 @@ class UserControllerTests {
 
     @BeforeEach
     public void setUp() throws Exception {
-        testUser = Instancio.of(User.class)
-                .ignore(Select.field("id"))
-                .ignore(Select.field("encodedPassword"))
-                .supply(Select.field("firstName"), () -> faker.name().firstName())
-                .supply(Select.field("lastName"), () -> faker.name().lastName())
-                .supply(Select.field("email"), () -> faker.internet().emailAddress())
-                .create();
-
-        String password = faker.internet().password(3, 10);
-        String encodedPassword = passwordEncoder.encode(password);
-        testUser.setEncodedPassword(encodedPassword);
-
+        testUser = Instancio.of(modelGenerator.getUserModel())
+                        .create();
         userRepository.save(testUser);
 
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));

@@ -3,6 +3,8 @@ package hexlet.code.controller;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
+import hexlet.code.exception.MethodNotAllowedException;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.TaskStatusService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +29,15 @@ public class TaskStatusController {
     @Autowired
     private TaskStatusService statusService;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     @GetMapping("")
     public ResponseEntity<List<TaskStatusDTO>> index() {
-        List<TaskStatusDTO> statuses = statusService.getAll();
+        List<TaskStatusDTO> statusDTOList = statusService.getAll();
         return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(statuses.size()))
-                .body(statuses);
+                .header("X-Total-Count", String.valueOf(statusDTOList.size()))
+                .body(statusDTOList);
     }
 
     @GetMapping("/{id}")
@@ -54,6 +59,10 @@ public class TaskStatusController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
+        if (!taskRepository.findByTaskStatusId(id).isEmpty()) {
+            throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
+        }
+
         statusService.delete(id);
     }
 

@@ -4,6 +4,8 @@ import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.exception.AccessDeniedException;
+import hexlet.code.exception.MethodNotAllowedException;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
@@ -31,6 +33,9 @@ public class UserController {
 
     @Autowired
     private UserUtils userUtils;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @GetMapping("")
     public ResponseEntity<List<UserDTO>> index() {
@@ -65,6 +70,11 @@ public class UserController {
         if (userUtils.getCurrentUser().getId() != id) {
             throw new AccessDeniedException("You do not have permission to delete this user");
         }
+
+        if (!taskRepository.findByAssigneeId(id).isEmpty()) {
+            throw new MethodNotAllowedException("You cannot delete a user. The user is associated with tasks.");
+        }
+
         userService.delete(id);
     }
 }
