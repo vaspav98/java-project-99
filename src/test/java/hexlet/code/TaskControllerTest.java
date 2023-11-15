@@ -1,14 +1,15 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
-import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -52,10 +55,10 @@ public class TaskControllerTest {
     private TaskStatusRepository statusRepository;
 
     @Autowired
-    private ObjectMapper om;
+    private LabelRepository labelRepository;
 
     @Autowired
-    private Faker faker;
+    private ObjectMapper om;
 
     @Autowired
     private ModelGenerator modelGenerator;
@@ -63,6 +66,8 @@ public class TaskControllerTest {
     private Task testTask;
 
     private TaskStatus testStatus;
+
+    private Label testLabel;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
@@ -79,8 +84,13 @@ public class TaskControllerTest {
                 .create();
         statusRepository.save(testStatus);
 
+        Label testLabel = Instancio.of(modelGenerator.getLabelModel())
+                .create();
+        labelRepository.save(testLabel);
+
         testTask.setTaskStatus(testStatus);
         testTask.setAssignee(testUser);
+        testTask.setLabels(new ArrayList<>(List.of(testLabel)));
         taskRepository.save(testTask);
 
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
@@ -98,7 +108,8 @@ public class TaskControllerTest {
                 a -> a.node("index").isEqualTo(testTask.getIndex()),
                 a -> a.node("content").isEqualTo(testTask.getDescription()),
                 a -> a.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
-                a -> a.node("assignee_id").isEqualTo(testTask.getAssignee().getId())
+                a -> a.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
+                a -> a.node("taskLabelIds").isArray()            // .contains(testLabel.getId())
         );
     }
 
@@ -131,6 +142,7 @@ public class TaskControllerTest {
         assertThat(addedTask.getDescription()).isEqualTo(data.get("content"));
         assertThat(addedTask.getTaskStatus()).isEqualTo(testStatus);
         assertThat(addedTask.getAssignee()).isNull();
+        assertThat(addedTask.getLabels()).isEmpty();
     }
 
     @Test

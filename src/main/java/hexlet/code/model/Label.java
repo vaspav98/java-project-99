@@ -5,12 +5,10 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -21,33 +19,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "labels")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class Task implements BaseEntity {
+public class Label {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
+    @Size(min = 3, max = 1000)
     private String name;
 
-    private Integer index;
-
-    @Lob
-    private String description;
-
-    @ManyToOne
-    @NotNull
-    private TaskStatus taskStatus;
-
-    @ManyToOne
-    private User assignee;
-
-    @ManyToMany
-    private List<Label> labels = new ArrayList<>();
+    @ManyToMany(mappedBy = "labels")
+    private List<Task> tasks = new ArrayList<>();
 
     @CreatedDate
     private LocalDate createdAt;

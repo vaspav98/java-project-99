@@ -1,11 +1,13 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.UserCreateDTO;
-import hexlet.code.dto.UserDTO;
-import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.dto.user.UserCreateDTO;
+import hexlet.code.dto.user.UserDTO;
+import hexlet.code.dto.user.UserUpdateDTO;
+import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.exception.ResourceNotFountException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -61,6 +66,10 @@ public class UserService {
     }
 
     public void delete(Long id) {
+        if (!taskRepository.findByAssigneeId(id).isEmpty()) {
+            throw new MethodNotAllowedException("You cannot delete a user. The user is associated with tasks.");
+        }
+
         userRepository.deleteById(id);
     }
 

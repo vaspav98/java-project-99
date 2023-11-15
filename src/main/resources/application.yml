@@ -11,3 +11,7 @@ spring:
 rsa:
   private-key: classpath:certs/private_key.pem
   public-key: classpath:certs/public_key.pem
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html

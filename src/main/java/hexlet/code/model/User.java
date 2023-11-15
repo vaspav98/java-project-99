@@ -48,7 +48,7 @@ public class User implements BaseEntity, UserDetails {
     private String encodedPassword;
 
     @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
     @CreatedDate
     private LocalDate createdAt;

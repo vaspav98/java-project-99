@@ -2,6 +2,9 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.AuthRequest;
 import hexlet.code.util.JWTUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,8 +23,12 @@ public class AuthenticationController {
     @Autowired
     private JWTUtils jwtUtils;
 
+    @Operation(summary = "User authentication")
+    @ApiResponse(responseCode = "200", description = "You have successfully authenticated")
     @PostMapping("/login")
-    public String logIn(@RequestBody AuthRequest authRequest) {
+    public String logIn(
+            @Parameter(description = "Your login and password")
+            @RequestBody AuthRequest authRequest) {
         var authentication = new UsernamePasswordAuthenticationToken(
                 authRequest.getUsername(), authRequest.getPassword());
 

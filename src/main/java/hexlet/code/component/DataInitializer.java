@@ -1,9 +1,12 @@
 package hexlet.code.component;
 
-import hexlet.code.dto.TaskStatusCreateDTO;
-import hexlet.code.dto.UserCreateDTO;
+import hexlet.code.dto.label.LabelCreateDTO;
+import hexlet.code.dto.task_status.TaskStatusCreateDTO;
+import hexlet.code.dto.user.UserCreateDTO;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.service.LabelService;
 import hexlet.code.service.TaskStatusService;
 import hexlet.code.service.UserService;
 import lombok.AllArgsConstructor;
@@ -12,7 +15,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -30,6 +35,12 @@ public class DataInitializer implements ApplicationRunner {
 
     @Autowired
     private TaskStatusService statusService;
+
+    @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
+    private LabelService labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -54,12 +65,21 @@ public class DataInitializer implements ApplicationRunner {
                         "to_publish", "Готово к публикации", "published", "Опубликовано")
         );
 
+        TaskStatusCreateDTO statusData = new TaskStatusCreateDTO();
         for (Map.Entry<String, String> status : statuses.entrySet()) {
-            TaskStatusCreateDTO data = new TaskStatusCreateDTO();
             if (statusRepository.findBySlug(status.getKey()).isEmpty()) {
-                data.setSlug(status.getKey());
-                data.setName(status.getValue());
-                statusService.create(data);
+                statusData.setSlug(status.getKey());
+                statusData.setName(status.getValue());
+                statusService.create(statusData);
+            }
+        }
+
+        List<String> labels = new ArrayList<>(List.of("bug", "feature"));
+        LabelCreateDTO labelData = new LabelCreateDTO();
+        for (String label : labels) {
+            if (labelRepository.findByName(label).isEmpty()) {
+                labelData.setName(label);
+                labelService.create(labelData);
             }
         }
     }

@@ -1,13 +1,17 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.UserCreateDTO;
-import hexlet.code.dto.UserDTO;
-import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.dto.user.UserCreateDTO;
+import hexlet.code.dto.user.UserDTO;
+import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.exception.AccessDeniedException;
-import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +41,9 @@ public class UserController {
     @Autowired
     private TaskRepository taskRepository;
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Get list of all users")
+    @ApiResponse(responseCode = "200", description = "List of all users")
     @GetMapping("")
     public ResponseEntity<List<UserDTO>> index() {
         List<UserDTO> userDTOList = userService.getAll();
@@ -45,34 +52,58 @@ public class UserController {
                 .body(userDTOList);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Get specific user by his id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "404", description = "User with that id not found")
+    })
     @GetMapping("/{id}")
-    public UserDTO show(@PathVariable Long id) {
+    public UserDTO show(
+            @Parameter(description = "Id of user to be found")
+            @PathVariable Long id) {
         return userService.getById(id);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Create new user")
+    @ApiResponse(responseCode = "201", description = "User created")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO create(@Valid @RequestBody UserCreateDTO data) {
+    public UserDTO create(
+            @Parameter(description = "User data to save")
+            @Valid @RequestBody UserCreateDTO data) {
         return userService.create(data);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Update user by his id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User updated"),
+            @ApiResponse(responseCode = "404", description = "User with that id not found")
+    })
     @PutMapping("/{id}")
-    public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO data) {
+    public UserDTO update(
+            @Parameter(description = "Id of user to be updated")
+            @PathVariable Long id,
+            @Parameter(description = "User data to update")
+            @Valid @RequestBody UserUpdateDTO data) {
         if (userUtils.getCurrentUser().getId() != id) {
             throw new AccessDeniedException("You do not have permission to update this user");
         }
         return userService.update(id, data);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Delete user by his id")
+    @ApiResponse(responseCode = "204", description = "User deleted")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(
+            @Parameter(description = "Id of user to be deleted")
+            @PathVariable Long id) {
         if (userUtils.getCurrentUser().getId() != id) {
             throw new AccessDeniedException("You do not have permission to delete this user");
-        }
-
-        if (!taskRepository.findByAssigneeId(id).isEmpty()) {
-            throw new MethodNotAllowedException("You cannot delete a user. The user is associated with tasks.");
         }
 
         userService.delete(id);

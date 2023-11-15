@@ -1,11 +1,14 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.TaskStatusCreateDTO;
-import hexlet.code.dto.TaskStatusDTO;
-import hexlet.code.dto.TaskStatusUpdateDTO;
-import hexlet.code.exception.MethodNotAllowedException;
-import hexlet.code.repository.TaskRepository;
+import hexlet.code.dto.task_status.TaskStatusCreateDTO;
+import hexlet.code.dto.task_status.TaskStatusDTO;
+import hexlet.code.dto.task_status.TaskStatusUpdateDTO;
 import hexlet.code.service.TaskStatusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +32,9 @@ public class TaskStatusController {
     @Autowired
     private TaskStatusService statusService;
 
-    @Autowired
-    private TaskRepository taskRepository;
-
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Get list of all taskStatuses")
+    @ApiResponse(responseCode = "200", description = "List of all statuses")
     @GetMapping("")
     public ResponseEntity<List<TaskStatusDTO>> index() {
         List<TaskStatusDTO> statusDTOList = statusService.getAll();
@@ -40,29 +43,53 @@ public class TaskStatusController {
                 .body(statusDTOList);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Get specific taskStatus by its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status found"),
+            @ApiResponse(responseCode = "404", description = "Status with that id not found")
+    })
     @GetMapping("/{id}")
-    public TaskStatusDTO show(@PathVariable Long id) {
+    public TaskStatusDTO show(
+            @Parameter(description = "Id of status to be found")
+            @PathVariable Long id) {
         return statusService.getById(id);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Create new taskStatus")
+    @ApiResponse(responseCode = "201", description = "Status created")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO data) {
+    public TaskStatusDTO create(
+            @Parameter(description = "Status data to save")
+            @Valid @RequestBody TaskStatusCreateDTO data) {
         return statusService.create(data);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Update taskStatus by its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status updated"),
+            @ApiResponse(responseCode = "404", description = "Status with that id not found")
+    })
     @PutMapping("/{id}")
-    public TaskStatusDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO data) {
+    public TaskStatusDTO update(
+            @Parameter(description = "Id of status to be updated")
+            @PathVariable Long id,
+            @Parameter(description = "Status data to update")
+            @Valid @RequestBody TaskStatusUpdateDTO data) {
         return statusService.update(id, data);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Delete taskStatus by its id")
+    @ApiResponse(responseCode = "204", description = "Status deleted")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        if (!taskRepository.findByTaskStatusId(id).isEmpty()) {
-            throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
-        }
-
+    public void delete(
+            @Parameter(description = "Id of user to be deleted")
+            @PathVariable Long id) {
         statusService.delete(id);
     }
 

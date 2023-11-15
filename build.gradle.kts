@@ -5,6 +5,7 @@ plugins {
 	application
 	jacoco
 	checkstyle
+	id ("com.adarshr.test-logger") version "3.2.0"
 	id("io.freefair.lombok") version "8.4"
 	id("org.springframework.boot") version "3.1.5"
 	id("io.spring.dependency-management") version "1.1.3"
@@ -31,6 +32,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-devtools")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql:42.6.0")
 	implementation("net.datafaker:datafaker:2.0.1")
