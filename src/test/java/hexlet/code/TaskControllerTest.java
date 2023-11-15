@@ -84,7 +84,7 @@ public class TaskControllerTest {
                 .create();
         statusRepository.save(testStatus);
 
-        Label testLabel = Instancio.of(modelGenerator.getLabelModel())
+        testLabel = Instancio.of(modelGenerator.getLabelModel())
                 .create();
         labelRepository.save(testLabel);
 
@@ -109,18 +109,29 @@ public class TaskControllerTest {
                 a -> a.node("content").isEqualTo(testTask.getDescription()),
                 a -> a.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
                 a -> a.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
-                a -> a.node("taskLabelIds").isArray()            // .contains(testLabel.getId())
+                a -> a.node("taskLabelIds").isArray()
         );
     }
 
     @Test
     public void testIndex() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/tasks").with(token))
+        MvcResult result = mockMvc.perform(get("/api/tasks").with(token)
+                        .param("titleCont", testTask.getName())
+                        .param("assigneeId", String.valueOf(testTask.getAssignee().getId()))
+                        .param("status", testStatus.getSlug())
+                        .param("labelId", String.valueOf(testLabel.getId())))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray().isNotEmpty();
+
+        MvcResult result2 = mockMvc.perform(get("/api/tasks").with(token)
+                        .param("assigneeId", "000"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String body2 = result2.getResponse().getContentAsString();
+        assertThatJson(body2).isArray().isEmpty();
+
     }
 
     @Test

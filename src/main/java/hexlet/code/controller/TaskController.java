@@ -2,6 +2,7 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,8 +37,10 @@ public class TaskController {
     @Operation(summary = "Get list of all tasks")
     @ApiResponse(responseCode = "200", description = "List of all tasks")
     @GetMapping("")
-    public ResponseEntity<List<TaskDTO>> index() {
-        List<TaskDTO> taskDTOList = taskService.getAll();
+    public ResponseEntity<List<TaskDTO>> index(
+            @Parameter(description = "Options for filtering tasks")
+            TaskParamsDTO params) {
+        List<TaskDTO> taskDTOList = taskService.getAll(params);
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(taskDTOList.size()))
                 .body(taskDTOList);
