@@ -90,7 +90,7 @@ public class LabelControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        Label addedLabel = labelRepository.findByName(data.get("name")).orElse(null);
+        Label addedLabel = labelRepository.findByName(data.get("name")).get(0);
 
         assertThat(addedLabel).isNotNull();
         assertThat(addedLabel.getName()).isEqualTo("bigBug");
