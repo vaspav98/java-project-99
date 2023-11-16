@@ -9,6 +9,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.service.LabelService;
 import hexlet.code.service.TaskStatusService;
 import hexlet.code.service.UserService;
+import io.sentry.Sentry;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -44,6 +45,12 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        try {
+            throw new Exception("This is a test.");
+        } catch (Exception e) {
+            Sentry.captureException(e);
+        }
+
         if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
             String firstName = "Pavel";
             String lastName = "Vasilev";

@@ -9,6 +9,7 @@ plugins {
 	id("io.freefair.lombok") version "8.4"
 	id("org.springframework.boot") version "3.1.5"
 	id("io.spring.dependency-management") version "1.1.3"
+	id("io.sentry.jvm.gradle") version "3.14.0"
 }
 
 group = "hexlet.code"
@@ -20,6 +21,20 @@ repositories {
 
 application {
 	mainClass.set("hexlet.code.AppApplication")
+}
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}
+
+sentry {
+	includeSourceContext.set(true)
+
+	org.set("not-from-the-organization")
+	projectName.set("task-manager")
+	authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
 }
 
 dependencies {
