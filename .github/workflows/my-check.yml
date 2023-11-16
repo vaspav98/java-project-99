@@ -16,6 +16,8 @@ jobs:
           java-version: '20'
           distribution: 'temurin'
       - run: make build
+        env:
+          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v3.2.0
         env:

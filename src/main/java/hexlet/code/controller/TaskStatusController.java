@@ -84,7 +84,10 @@ public class TaskStatusController {
 
     @SecurityRequirement(name = "JWT")
     @Operation(summary = "Delete taskStatus by its id")
-    @ApiResponse(responseCode = "204", description = "Status deleted")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Status deleted"),
+            @ApiResponse(responseCode = "404", description = "Status with that id not found")
+    })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(

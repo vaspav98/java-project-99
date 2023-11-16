@@ -7,7 +7,6 @@ import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.exception.ResourceNotFountException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
-import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +18,6 @@ public class TaskStatusService {
 
     @Autowired
     private TaskStatusRepository statusRepository;
-
-    @Autowired
-    private TaskRepository taskRepository;
 
     @Autowired
     private TaskStatusMapper statusMapper;
@@ -53,8 +49,10 @@ public class TaskStatusService {
         return statusMapper.map(status);
     }
 
-    public void delete(Long id) {
-        if (!taskRepository.findByTaskStatusId(id).isEmpty()) {
+        public void delete(Long id) {
+        TaskStatus status = statusRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFountException("Task status with id " + id + "not found"));
+        if (!status.getTasks().isEmpty()) {
             throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
         }
 
