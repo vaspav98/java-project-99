@@ -1,8 +1,8 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.task_status.TaskStatusCreateDTO;
-import hexlet.code.dto.task_status.TaskStatusDTO;
-import hexlet.code.dto.task_status.TaskStatusUpdateDTO;
+import hexlet.code.dto.TaskStatusCreateDTO;
+import hexlet.code.dto.TaskStatusDTO;
+import hexlet.code.dto.TaskStatusUpdateDTO;
 import hexlet.code.service.TaskStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

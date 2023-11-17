@@ -1,9 +1,9 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.task.TaskCreateDTO;
-import hexlet.code.dto.task.TaskDTO;
-import hexlet.code.dto.task.TaskParamsDTO;
-import hexlet.code.dto.task.TaskUpdateDTO;
+import hexlet.code.dto.TaskCreateDTO;
+import hexlet.code.dto.TaskDTO;
+import hexlet.code.dto.TaskParamsDTO;
+import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFountException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Task;

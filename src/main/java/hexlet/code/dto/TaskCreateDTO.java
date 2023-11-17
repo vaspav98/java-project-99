@@ -1,4 +1,4 @@
-package hexlet.code.dto.task;
+package hexlet.code.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
