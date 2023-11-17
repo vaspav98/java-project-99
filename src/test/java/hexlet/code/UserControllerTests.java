@@ -72,6 +72,9 @@ class UserControllerTests {
                 a -> a.node("lastName").isEqualTo(testUser.getLastName()),
                 a -> a.node("email").isEqualTo((testUser.getEmail()))
         );
+
+        mockMvc.perform(get("/api/users/" + 0).with(token))
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -70,6 +70,9 @@ public class TaskStatusControllerTest {
                 a -> a.node("name").isEqualTo(testStatus.getName()),
                 a -> a.node("slug").isEqualTo(testStatus.getSlug())
         );
+
+        mockMvc.perform(get("/api/task_statuses/" + 0).with(token))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -114,6 +117,11 @@ public class TaskStatusControllerTest {
         assertThat(updatedStatus).isNotNull();
         assertThat(updatedStatus.getName()).isEqualTo("hello2");
         assertThat(updatedStatus.getSlug()).isEqualTo(testStatus.getSlug());
+
+        mockMvc.perform(put("/api/task_statuses/" + 0).with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -123,6 +131,9 @@ public class TaskStatusControllerTest {
 
         TaskStatus destroyedStatus = taskStatusRepository.findById(testStatus.getId()).orElse(null);
         assertThat(destroyedStatus).isNull();
+
+        mockMvc.perform(delete("/api/task_statuses/" + 0).with(token))
+                .andExpect(status().isNotFound());
     }
 
 }

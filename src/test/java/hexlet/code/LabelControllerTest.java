@@ -67,6 +67,9 @@ public class LabelControllerTest {
         assertThatJson(body).and(
                 a -> a.node("name").isEqualTo(testLabel.getName())
         );
+
+        mockMvc.perform(get("/api/labels/" + 0).with(token))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -110,6 +113,11 @@ public class LabelControllerTest {
         Label updatedLabel = labelRepository.findById(testLabel.getId()).orElse(null);
         assertThat(updatedLabel).isNotNull();
         assertThat(updatedLabel.getName()).isEqualTo("hello2");
+
+        mockMvc.perform(put("/api/labels/" + 0).with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -119,6 +127,9 @@ public class LabelControllerTest {
 
         Label destroyedLabel = labelRepository.findById(testLabel.getId()).orElse(null);
         assertThat(destroyedLabel).isNull();
+
+        mockMvc.perform(delete("/api/labels/" + 0).with(token))
+                .andExpect(status().isNotFound());
     }
 
 }

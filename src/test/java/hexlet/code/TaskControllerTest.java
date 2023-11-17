@@ -111,6 +111,9 @@ public class TaskControllerTest {
                 a -> a.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
                 a -> a.node("taskLabelIds").isArray()
         );
+
+        mockMvc.perform(get("/api/tasks/" + testTask.getId()).with(token))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -171,6 +174,11 @@ public class TaskControllerTest {
         assertThat(updatedTask).isNotNull();
         assertThat(updatedTask.getName()).isEqualTo("newTitle");
         assertThat(updatedTask.getIndex()).isEqualTo(testTask.getIndex());
+
+        mockMvc.perform(put("/api/tasks/" + 0).with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
