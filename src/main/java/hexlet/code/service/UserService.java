@@ -4,31 +4,29 @@ import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.exception.MethodNotAllowedException;
-import hexlet.code.exception.ResourceNotFountException;
+import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private PasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
     public List<UserDTO> getAll() {
         List<User> users = userRepository.findAll();
@@ -39,7 +37,7 @@ public class UserService {
 
     public UserDTO getById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFountException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         return userMapper.map(user);
     }
 
@@ -53,7 +51,7 @@ public class UserService {
 
     public UserDTO update(Long id, UserUpdateDTO data) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFountException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         userMapper.update(data, user);
 
         if (data.getPassword() != null) {
@@ -66,12 +64,15 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        if (!taskRepository.findByAssigneeId(id).isEmpty()) {
+/*        if (!taskRepository.findByAssigneeId(id).isEmpty()) {
+            throw new MethodNotAllowedException("You cannot delete a user. The user is associated with tasks.");
+        }*/
+
+        try {
+            userRepository.deleteById(id);
+        } catch (DataIntegrityViolationException ex) {
             throw new MethodNotAllowedException("You cannot delete a user. The user is associated with tasks.");
         }
-
-        userRepository.deleteById(id);
     }
-
 
 }

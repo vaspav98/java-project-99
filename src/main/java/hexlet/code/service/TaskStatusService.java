@@ -4,23 +4,23 @@ import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
 import hexlet.code.exception.MethodNotAllowedException;
-import hexlet.code.exception.ResourceNotFountException;
+import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class TaskStatusService {
 
-    @Autowired
-    private TaskStatusRepository statusRepository;
+    private final TaskStatusRepository statusRepository;
 
-    @Autowired
-    private TaskStatusMapper statusMapper;
+    private final TaskStatusMapper statusMapper;
 
     public List<TaskStatusDTO> getAll() {
         List<TaskStatus> statuses = statusRepository.findAll();
@@ -31,7 +31,7 @@ public class TaskStatusService {
 
     public TaskStatusDTO getById(Long id) {
         TaskStatus status = statusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFountException("Task status with id " + id + "not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task status with id " + id + "not found"));
         return statusMapper.map(status);
     }
 
@@ -43,7 +43,7 @@ public class TaskStatusService {
 
     public TaskStatusDTO update(Long id, TaskStatusUpdateDTO data) {
         TaskStatus status = statusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFountException("Task status with id " + id + "not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task status with id " + id + "not found"));
         statusMapper.update(data, status);
         statusRepository.save(status);
         return statusMapper.map(status);
@@ -51,12 +51,17 @@ public class TaskStatusService {
 
         public void delete(Long id) {
         TaskStatus status = statusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFountException("Task status with id " + id + "not found"));
-        if (!status.getTasks().isEmpty()) {
+                .orElseThrow(() -> new ResourceNotFoundException("Task status with id " + id + "not found"));
+/*        if (!status.getTasks().isEmpty()) {
+            throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
+        }*/
+
+
+        try {
+            statusRepository.deleteById(id);
+        } catch (DataIntegrityViolationException ex) {
             throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
         }
-
-        statusRepository.deleteById(id);
     }
 
 }

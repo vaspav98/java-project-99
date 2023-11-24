@@ -73,7 +73,8 @@ class UserControllerTests {
                 a -> a.node("email").isEqualTo((testUser.getEmail()))
         );
 
-        mockMvc.perform(get("/api/users/" + 0).with(token))
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token));
+        mockMvc.perform(get("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isNotFound());
     }
 
@@ -121,6 +122,10 @@ class UserControllerTests {
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getFirstName()).isEqualTo("Pavel");
         assertThat(updatedUser.getLastName()).isEqualTo(testUser.getLastName());
+
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token));
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -130,6 +135,9 @@ class UserControllerTests {
 
         User destroyedUser = userRepository.findById(testUser.getId()).orElse(null);
         assertThat(destroyedUser).isNull();
+
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
+                .andExpect(status().isForbidden());
     }
 
 }

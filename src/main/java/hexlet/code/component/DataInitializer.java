@@ -11,7 +11,6 @@ import hexlet.code.service.TaskStatusService;
 import hexlet.code.service.UserService;
 import io.sentry.Sentry;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -25,23 +24,17 @@ import java.util.Map;
 @AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TaskStatusRepository statusRepository;
+    private final TaskStatusRepository statusRepository;
 
-    @Autowired
-    private TaskStatusService statusService;
+    private final TaskStatusService statusService;
 
-    @Autowired
-    private LabelRepository labelRepository;
+    private final LabelRepository labelRepository;
 
-    @Autowired
-    private LabelService labelService;
+    private final LabelService labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

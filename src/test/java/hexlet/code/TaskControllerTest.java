@@ -112,8 +112,9 @@ public class TaskControllerTest {
                 a -> a.node("taskLabelIds").isArray()
         );
 
+        mockMvc.perform(delete("/api/tasks/" + testTask.getId()).with(token));
         mockMvc.perform(get("/api/tasks/" + testTask.getId()).with(token))
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -175,7 +176,9 @@ public class TaskControllerTest {
         assertThat(updatedTask.getName()).isEqualTo("newTitle");
         assertThat(updatedTask.getIndex()).isEqualTo(testTask.getIndex());
 
-        mockMvc.perform(put("/api/tasks/" + 0).with(token)
+
+        mockMvc.perform(delete("/api/tasks/" + testTask.getId()).with(token));
+        mockMvc.perform(put("/api/tasks/" + testTask.getId()).with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(data)))
                 .andExpect(status().isNotFound());
@@ -188,6 +191,9 @@ public class TaskControllerTest {
 
         Task destroyedTask = taskRepository.findById(testTask.getId()).orElse(null);
         assertThat(destroyedTask).isNull();
+
+        mockMvc.perform(delete("/api/tasks/" + testTask.getId()).with(token))
+                .andExpect(status().isNotFound());
     }
 
 }

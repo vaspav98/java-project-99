@@ -3,19 +3,17 @@ package hexlet.code.controller;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
-import hexlet.code.exception.AccessDeniedException;
-import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.UserService;
-import hexlet.code.util.UserUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,16 +28,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@AllArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private static final String ONLY_OWNER_BY_ID = """
+            @userUtils.getCurrentUser().getId() == #id
+        """;
 
-    @Autowired
-    private UserUtils userUtils;
-
-    @Autowired
-    private TaskRepository taskRepository;
+    private final UserService userService;
 
     @SecurityRequirement(name = "JWT")
     @Operation(summary = "Get list of all users")
@@ -83,14 +79,13 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User with that id not found")
     })
     @PutMapping("/{id}")
+    @PreAuthorize(ONLY_OWNER_BY_ID)
     public UserDTO update(
             @Parameter(description = "Id of user to be updated")
             @PathVariable Long id,
             @Parameter(description = "User data to update")
             @Valid @RequestBody UserUpdateDTO data) {
-        if (userUtils.getCurrentUser().getId() != id) {
-            throw new AccessDeniedException("You do not have permission to update this user");
-        }
+
         return userService.update(id, data);
     }
 
@@ -99,12 +94,10 @@ public class UserController {
     @ApiResponse(responseCode = "204", description = "User deleted")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(ONLY_OWNER_BY_ID)
     public void delete(
             @Parameter(description = "Id of user to be deleted")
-            @PathVariable Long id) {
-        if (userUtils.getCurrentUser().getId() != id) {
-            throw new AccessDeniedException("You do not have permission to delete this user");
-        }
+            @PathVariable final Long id) {
 
         userService.delete(id);
     }
