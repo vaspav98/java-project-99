@@ -17,7 +17,9 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Mapper(
         uses = {JsonNullableMapper.class, ReferenceMapper.class},
@@ -59,11 +61,11 @@ public abstract class TaskMapper {
                 .orElseThrow(() -> new ResourceNotFoundException("TaskStatus with slug " + statusSlug + " not found"));
     }
 
-    public List<Label> toLabelList(List<Long> ids) {
-        return labelRepository.findAllById(ids);
+    public Set<Label> toLabelSet(List<Long> ids) {
+        return new HashSet<>(labelRepository.findAllById(ids));
     }
 
-    public List<Long> toLabelIdList(List<Label> labels) {
+    public List<Long> toLabelIdList(Set<Label> labels) {
         return labels.stream()
                 .map(l -> l.getId())
                 .toList();
