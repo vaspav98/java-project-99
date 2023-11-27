@@ -3,13 +3,11 @@ package hexlet.code.service;
 import hexlet.code.dto.LabelCreateDTO;
 import hexlet.code.dto.LabelDTO;
 import hexlet.code.dto.LabelUpdateDTO;
-import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,14 +51,7 @@ public class LabelService {
         Label label = labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
 
-/*        if (!label.getTasks().isEmpty()) {
-            throw new MethodNotAllowedException("You cannot delete a label. The label is associated with tasks.");
-        }*/
-        try {
-            labelRepository.deleteById(id);
-        } catch (DataIntegrityViolationException ex) {
-            throw new MethodNotAllowedException("You cannot delete a label. The label is associated with tasks.");
-        }
+        labelRepository.deleteById(id);
     }
 
 }

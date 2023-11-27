@@ -3,13 +3,11 @@ package hexlet.code.service;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
-import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,16 +50,8 @@ public class TaskStatusService {
         public void delete(Long id) {
         TaskStatus status = statusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task status with id " + id + "not found"));
-/*        if (!status.getTasks().isEmpty()) {
-            throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
-        }*/
 
-
-        try {
-            statusRepository.deleteById(id);
-        } catch (DataIntegrityViolationException ex) {
-            throw new MethodNotAllowedException("You cannot delete a status. The status is associated with tasks.");
-        }
+        statusRepository.deleteById(id);
     }
 
 }

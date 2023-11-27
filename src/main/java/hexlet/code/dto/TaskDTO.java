@@ -12,7 +12,7 @@ public class TaskDTO {
     private Long id;
     private String title;
     private Integer index;
-    private String content = "";
+    private String content;
     private String status;
     private Long assignee_id;
     private List<Long> taskLabelIds;

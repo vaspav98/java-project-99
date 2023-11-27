@@ -2,3 +2,4 @@
 build/
 .idea/
 HELP.md
+node_modules/

@@ -7,10 +7,12 @@ spring:
     ansi:
       enabled: ALWAYS
   profiles:
-    default: development
+    default: development\
 rsa:
   private-key: classpath:certs/private_key.pem
   public-key: classpath:certs/public_key.pem
+
+
 
 springdoc:
   swagger-ui:
