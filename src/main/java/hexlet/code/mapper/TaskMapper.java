@@ -9,6 +9,7 @@ import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
+import lombok.Getter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -27,6 +28,7 @@ import java.util.Set;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
+@Getter
 public abstract class TaskMapper {
 
     @Autowired
@@ -35,11 +37,14 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
+    private final String defaultContent = "";
+
     @Mapping(source = "title", target = "name")
-    @Mapping(source = "content", target = "description")
     @Mapping(source = "status", target = "taskStatus")
     @Mapping(source = "assignee_id", target = "assignee")
     @Mapping(source = "taskLabelIds", target = "labels")
+    @Mapping(target = "description",
+            expression = "java(dto.getContent() == null ? getDefaultContent() : dto.getContent())")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "name", target = "title")
