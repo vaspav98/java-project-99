@@ -22,12 +22,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mapper(
-        uses = {JsonNullableMapper.class, ReferenceMapper.class},
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        componentModel = MappingConstants.ComponentModel.SPRING,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
-)
+    @Mapper(
+            uses = {JsonNullableMapper.class, ReferenceMapper.class},
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+            componentModel = MappingConstants.ComponentModel.SPRING,
+            unmappedTargetPolicy = ReportingPolicy.IGNORE
+    )
 @Getter
 public abstract class TaskMapper {
 

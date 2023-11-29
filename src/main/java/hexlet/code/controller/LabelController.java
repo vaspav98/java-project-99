@@ -95,22 +95,4 @@ public class LabelController {
             @PathVariable Long id) {
         labelService.delete(id);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
